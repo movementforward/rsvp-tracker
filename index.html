@@ -26,6 +26,22 @@
             <div id="needFollowUp"></div>
         </div>
         <div id="chartdiv"></div>
+
+        <div style="text-align: center;"> 
+            <h4>Confirmations</h4>
+        </div>
+        <div class="table-responsive">
+          <table id="myTable" class="table table-striped">
+            <thead>
+              <tr>
+                <th scope="col">Name</th>
+                <th scope="col">Organization</th>
+              </tr>
+            </thead>
+            <tbody>
+            </tbody>
+          </table>
+        </div>
     </body>
     <script>
         var total = 0;
@@ -82,7 +98,16 @@
                     pieSeries.hiddenState.properties.startAngle = -90;
                 
             });// end am4core.ready()
+
+            var confirmationsUrl = 'https://spreadsheets.google.com/feeds/list/1BLVsb7bkJVuXOxf-hfVzqVBrsSNwtA_OC_jBX2lMDHk/3/public/full?alt=json';
+            $.getJSON(confirmationsUrl, function (data) {
+                var entries = data.feed.entry;
+                for (let entry of entries) {
+                    $('#myTable tr:last').after('<tr><td>' + entry["gsx$title"]["$t"] + ' ' + entry["gsx$firstname"]["$t"] + ' ' + entry["gsx$lastname"]["$t"] + '</td><td>' + entry["gsx$organization"]["$t"] +'</td></tr>');
+                }
+            })
         });
+
 
     </script>
 </html>  
