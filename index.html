@@ -15,70 +15,74 @@
         <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
         <!-- Chart code -->
-        <script>
-            var rsvp = 0;
-            var needFollowUp = 0;
-            var total = 0;
-
-            $(function () {
-                var sheetUrl = 'https://spreadsheets.google.com/feeds/list/1BLVsb7bkJVuXOxf-hfVzqVBrsSNwtA_OC_jBX2lMDHk/2/public/full?alt=json';
-                $.getJSON(sheetUrl, function (data) {
-                    var entries = data.feed.entry;
-                    for (let entry of entries) {
-                        console.log(entry);
-                        if (entry["gsx$agg"]["$t"] == "RSVP"){
-                            rsvp = parseInt(entry["gsx$count"]["$t"]);
-                        } else if (entry["gsx$agg"]["$t"] == "Need Follow Up") {
-                            needFollowUp = parseInt(entry["gsx$count"]["$t"]);
-                        } else if (entry["gsx$agg"]["$t"] == "Total") {
-                            total = parseInt(entry["gsx$count"]["$t"]);
-                        }
-                    }
-                    console.log('RSVP ' + rsvp);
-                    console.log('Need Follow Up ' + needFollowUp);
-                    console.log('Total ' + total);
-                }).then(function() {
-                        // Themes begin
-                        am4core.useTheme(am4themes_animated);
-                        // Themes end
-                        
-                        // Create chart instance
-                        var chart = am4core.create("chartdiv", am4charts.PieChart);
-                        
-                        // Add data
-                        chart.data = [ {
-                            "status": "Awaiting Reply",
-                            "count": total - rsvp - needFollowUp
-                        }, {
-                            "status": "Needs Follow Up",
-                            "count": needFollowUp
-                        }, {
-                            "status": "Confirmed",
-                            "count": rsvp
-                        }];
-                        
-                        // Add and configure Series
-                        var pieSeries = chart.series.push(new am4charts.PieSeries());
-                        pieSeries.dataFields.value = "count";
-                        pieSeries.dataFields.category = "status";
-                        pieSeries.slices.template.stroke = am4core.color("#fff");
-                        pieSeries.slices.template.strokeWidth = 2;
-                        pieSeries.slices.template.strokeOpacity = 1;
-                        
-                        // This creates initial animation
-                        pieSeries.hiddenState.properties.opacity = 1;
-                        pieSeries.hiddenState.properties.endAngle = -90;
-                        pieSeries.hiddenState.properties.startAngle = -90;
-                    
-                });// end am4core.ready()
-            });
-
-        </script>
     </head>
     <!-- HTML -->
     <body>
-        <h2>Faith Leader RSVP Tracker</h2>
-        <h3>August 13, 2020</h3>
+        <div style="text-align: center;">
+            <h2>Faith Leader RSVP Tracker</h2>
+            <h3>August 13, 2020</h3> 
+            <div id="total"></div>     
+            <div id="rsvp"></div>
+            <div id="needFollowUp"></div>
+        </div>
         <div id="chartdiv"></div>
     </body>
+    <script>
+        var total = 0;
+        var rsvp = 0;
+        var needFollowUp = 0;
+
+        $(function () {
+            var sheetUrl = 'https://spreadsheets.google.com/feeds/list/1BLVsb7bkJVuXOxf-hfVzqVBrsSNwtA_OC_jBX2lMDHk/2/public/full?alt=json';
+            $.getJSON(sheetUrl, function (data) {
+                var entries = data.feed.entry;
+                for (let entry of entries) {
+                    if (entry["gsx$agg"]["$t"] == "RSVP"){
+                        rsvp = parseInt(entry["gsx$count"]["$t"]);
+                        $( "#rsvp" ).text("Confirmed: " + rsvp);
+                    } else if (entry["gsx$agg"]["$t"] == "Need Follow Up") {
+                        needFollowUp = parseInt(entry["gsx$count"]["$t"]);
+                        $( "#needFollowUp" ).text("Awaiting Follow Up: " + needFollowUp);
+                    } else if (entry["gsx$agg"]["$t"] == "Total") {
+                        total = parseInt(entry["gsx$count"]["$t"]);
+                        $( "#total" ).text("Total: " + total);
+                    }
+                }
+            }).then(function() {
+                    // Themes begin
+                    am4core.useTheme(am4themes_animated);
+                    // Themes end
+                    
+                    // Create chart instance
+                    var chart = am4core.create("chartdiv", am4charts.PieChart);
+                    
+                    // Add data
+                    chart.data = [ {
+                        "status": "Awaiting Reply",
+                        "count": total - rsvp - needFollowUp
+                    }, {
+                        "status": "Needs Follow Up",
+                        "count": needFollowUp
+                    }, {
+                        "status": "Confirmed",
+                        "count": rsvp
+                    }];
+                    
+                    // Add and configure Series
+                    var pieSeries = chart.series.push(new am4charts.PieSeries());
+                    pieSeries.dataFields.value = "count";
+                    pieSeries.dataFields.category = "status";
+                    pieSeries.slices.template.stroke = am4core.color("#fff");
+                    pieSeries.slices.template.strokeWidth = 2;
+                    pieSeries.slices.template.strokeOpacity = 1;
+                    
+                    // This creates initial animation
+                    pieSeries.hiddenState.properties.opacity = 1;
+                    pieSeries.hiddenState.properties.endAngle = -90;
+                    pieSeries.hiddenState.properties.startAngle = -90;
+                
+            });// end am4core.ready()
+        });
+
+    </script>
 </html>  
