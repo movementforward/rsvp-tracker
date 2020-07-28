@@ -28,21 +28,61 @@
         </div>
         <div id="chartdiv" style="text-align: center;"> Loading...</div>
 
-        <div style="text-align: center;"> 
-            <h4>Confirmations</h4>
-        </div>
-        <div class="table-responsive">
-          <table id="myTable" class="table table-striped">
-            <thead>
-              <tr>
-                <th scope="col">Name</th>
-                <th scope="col">Organization</th>
-              </tr>
-            </thead>
-            <tbody>
-            </tbody>
-          </table>
-        </div>
+        <ul class="nav nav-tabs" id="myTab" role="tablist">
+            <li class="nav-item">
+              <a class="nav-link active" id="confirmation-tab" data-toggle="tab" href="#confirmations" role="tab" aria-controls="confirmations" aria-selected="true">Confirmations</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="decline-tab" data-toggle="tab" href="#declines" role="tab" aria-controls="declines" aria-selected="false">Declines</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" id="follow-up-tab" data-toggle="tab" href="#follow" role="tab" aria-controls="needFollowUp" aria-selected="false">Follow Up</a>
+            </li>
+          </ul>
+          <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" id="confirmations" role="tabpanel" aria-labelledby="confirmations-tab">
+                <div class="table-responsive">
+                    <table id="confirmationTable" class="table table-striped">
+                      <thead>
+                        <tr>
+                          <th scope="col">Name</th>
+                          <th scope="col">Organization</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="declines" role="tabpanel" aria-labelledby="declines-tab">
+                <div class="table-responsive">
+                    <table id="declineTable" class="table table-striped">
+                      <thead>
+                        <tr>
+                          <th scope="col">Name</th>
+                          <th scope="col">Organization</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="tab-pane fade" id="follow" role="tabpanel" aria-labelledby="follow-up-tab">
+                <div class="table-responsive">
+                    <table id="followUpTable" class="table table-striped">
+                      <thead>
+                        <tr>
+                          <th scope="col">Name</th>
+                          <th scope="col">Organization</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                      </tbody>
+                    </table>
+                </div>
+            </div>
+          </div>
     </body>
     <script>
         var total = 0;
@@ -55,10 +95,32 @@
             $.getJSON(confirmationsUrl, function (data) {
                 var entries = data.feed.entry;
                 for (let entry of entries) {
-                    $('#myTable tbody').append('<tr><td>' + entry["gsx$title"]["$t"] + ' ' + entry["gsx$firstname"]["$t"] + ' ' + entry["gsx$lastname"]["$t"] + '</td><td>' + entry["gsx$organization"]["$t"] +'</td></tr>');
+                    if (entry["gsx$firstname"]["$t"] != "#N/A"){
+                        $('#confirmationTable tbody').append('<tr><td>' + entry["gsx$title"]["$t"] + ' ' + entry["gsx$firstname"]["$t"] + ' ' + entry["gsx$lastname"]["$t"] + '</td><td>' + entry["gsx$organization"]["$t"] +'</td></tr>');
+                    }
                 }
             })
 
+            var declinesUrl = 'https://spreadsheets.google.com/feeds/list/1BLVsb7bkJVuXOxf-hfVzqVBrsSNwtA_OC_jBX2lMDHk/4/public/full?alt=json';
+            $.getJSON(declinesUrl, function (data) {
+                var entries = data.feed.entry;
+                for (let entry of entries) {
+                    if (entry["gsx$firstname"]["$t"] != "#N/A"){
+                        $('#declineTable tbody').append('<tr><td>' + entry["gsx$title"]["$t"] + ' ' + entry["gsx$firstname"]["$t"] + ' ' + entry["gsx$lastname"]["$t"] + '</td><td>' + entry["gsx$organization"]["$t"] +'</td></tr>');
+                    }
+                }
+            })
+
+            var needFollowUpUrl = 'https://spreadsheets.google.com/feeds/list/1BLVsb7bkJVuXOxf-hfVzqVBrsSNwtA_OC_jBX2lMDHk/5/public/full?alt=json';
+            $.getJSON(needFollowUpUrl, function (data) {
+                var entries = data.feed.entry;
+                for (let entry of entries) {
+                    if (entry["gsx$firstname"]["$t"] != "#N/A"){
+                        $('#followUpTable tbody').append('<tr><td>' + entry["gsx$title"]["$t"] + ' ' + entry["gsx$firstname"]["$t"] + ' ' + entry["gsx$lastname"]["$t"] + '</td><td>' + entry["gsx$organization"]["$t"] +'</td></tr>');
+                    }
+                }
+            })
+            
             var sheetUrl = 'https://spreadsheets.google.com/feeds/list/1BLVsb7bkJVuXOxf-hfVzqVBrsSNwtA_OC_jBX2lMDHk/2/public/full?alt=json';
             $.getJSON(sheetUrl, function (data) {
                 var entries = data.feed.entry;
