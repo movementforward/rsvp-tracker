@@ -23,6 +23,7 @@
             <h3>August 13, 2020</h3> 
             <div id="total"></div>     
             <div id="rsvp"></div>
+            <div id="decline"></div>
             <div id="needFollowUp"></div>
         </div>
         <div id="chartdiv" style="text-align: center;"> Loading...</div>
@@ -45,7 +46,8 @@
     </body>
     <script>
         var total = 0;
-        var rsvp = 0;
+        var confirm = 0;
+        var decline = 0;
         var needFollowUp = 0;
 
         $(function () {
@@ -61,15 +63,18 @@
             $.getJSON(sheetUrl, function (data) {
                 var entries = data.feed.entry;
                 for (let entry of entries) {
-                    if (entry["gsx$agg"]["$t"] == "RSVP"){
-                        rsvp = parseInt(entry["gsx$count"]["$t"]);
-                        $( "#rsvp" ).text("Confirmed: " + rsvp);
+                    if (entry["gsx$agg"]["$t"] == "Confirm"){
+                        confirm = parseInt(entry["gsx$count"]["$t"]);
+                        $( "#rsvp" ).text("Confirmed: " + confirm);
                     } else if (entry["gsx$agg"]["$t"] == "Need Follow Up") {
                         needFollowUp = parseInt(entry["gsx$count"]["$t"]);
                         $( "#needFollowUp" ).text("Awaiting Follow Up: " + needFollowUp);
                     } else if (entry["gsx$agg"]["$t"] == "Total") {
                         total = parseInt(entry["gsx$count"]["$t"]);
                         $( "#total" ).text("Total: " + total);
+                    } else if (entry["gsx$agg"]["$t"] == "Decline") {
+                        decline = parseInt(entry["gsx$count"]["$t"]);
+                        $( "#decline" ).text("Decline: " + decline);
                     }
                 }
             }).then(function() {
@@ -83,13 +88,16 @@
                     // Add data
                     chart.data = [ {
                         "status": "No Response",
-                        "count": total - rsvp - needFollowUp
+                        "count": total - confirm - needFollowUp - decline
                     }, {
                         "status": "Awaiting Follow Up",
                         "count": needFollowUp
                     }, {
                         "status": "Confirmed",
-                        "count": rsvp
+                        "count": confirm
+                    }, {
+                        "status": "Decline",
+                        "count": decline
                     }];
                     
                     // Add and configure Series
