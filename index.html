@@ -25,7 +25,7 @@
             <div id="rsvp"></div>
             <div id="needFollowUp"></div>
         </div>
-        <div id="chartdiv"></div>
+        <div id="chartdiv" style="text-align: center;"> Loading...</div>
 
         <div style="text-align: center;"> 
             <h4>Confirmations</h4>
@@ -53,7 +53,7 @@
             $.getJSON(confirmationsUrl, function (data) {
                 var entries = data.feed.entry;
                 for (let entry of entries) {
-                    $('#myTable tr:last').after('<tr><td>' + entry["gsx$title"]["$t"] + ' ' + entry["gsx$firstname"]["$t"] + ' ' + entry["gsx$lastname"]["$t"] + '</td><td>' + entry["gsx$organization"]["$t"] +'</td></tr>');
+                    $('#myTable tbody').append('<tr><td>' + entry["gsx$title"]["$t"] + ' ' + entry["gsx$firstname"]["$t"] + ' ' + entry["gsx$lastname"]["$t"] + '</td><td>' + entry["gsx$organization"]["$t"] +'</td></tr>');
                 }
             })
 
